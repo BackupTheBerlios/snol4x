@@ -11,5 +11,12 @@ class FacetSuite extends AssertionsForJUnit {
 	@Test
 	def facetCreation {
 		val someFacte = Facet( "some-facet" )
+		Facet.all.foreach( f => println( f.name ) )
+	}
+}
+
+object TestIt {
+	def main( args: Array[String] ) {
+		(new FacetSuite).facetCreation
 	}
 }

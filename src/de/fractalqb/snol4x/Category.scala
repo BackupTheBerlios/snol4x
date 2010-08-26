@@ -1,10 +1,11 @@
 package de.fractalqb.snol4x
 
 abstract class Category( val name: String,
-						 var prioThrh: Short )
+						 var prioThreshold: Short )
   extends Equals
 {
   private var subs = Set.empty[SubCategory]
+  private[snol4x] var logrs = Set.empty[Logger]
 
   def path: String
   def facet: Facet
@@ -27,7 +28,7 @@ abstract class Category( val name: String,
 
   def apply( pathStr: String, sep: String = "\\." ): Category =
 	this( pathStr split sep )
-
+	
   override def canEqual( that: Any ): Boolean =
 	that.isInstanceOf[Category]
 
