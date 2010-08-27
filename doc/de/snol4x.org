@@ -1,0 +1,128 @@
+* Motivation
+Was bring jemanden dazu, angesichts der allgemein verbreiteten und wohl
+auch bewährten Loggin Frameworks à la log4j, etwas neues auf einer
+(relativ) grünen Wiese zu bauen?
+
+Ausschlaggebend war die Frage, wie einzelne Log Einträge bei der
+Entwicklung von Komponenten so zu klassifizieren sind, dass sie in
+einer fertigen Anwendung gut konfigurierbar werden. Das gängige
+Vorgehen besteht darin, dem Entwickler – also dem Anwender des
+Logging Framewroks – /einen/ Zugangspunkt zum Log (vgl. log4j:
+Logger) zu bieten, der
+
+ 1) in einem hierarchischen Namensraum eindeutig angesiedelt und
+
+ 2) bzw. seiner "Wichtigkeit" global geordnet ist.
+
+Für die hierarchische Einordnung wird in Java gerne die Anordnung in
+der Paketstruktur inklusive der betreffenden Klasse genommen. Was die
+Anordnung bzgl. Wichtigkeit betrifft, so sind die üblichen
+Problemklassen – oder auch Log Level – "warning", "error" und
+"fatal" intuitiv als angeordnet zu verstehen. Bei der Bewertung von
+Log Leveln wie "info", "trace", "debug" oder "config" ist das nicht
+mehr so einfach objektiv möglich, auch wenn viele aus Gewohnheit eine
+Vorstellung dazu haben.
+
+** Facettenklassifikation
+Dieses Projekt möchte hierzu nun einen allgemeineren Ansatz anbieten,
+der es obendrein erlaubt das bisher übliche Konzept zur
+Klassifizierung von Log Einträgen nachzubilden. Das Stichwort hierzu
+lautet [[http://de.wikipedia.org/wiki/Facettenklassifikation][Facettenklassifikation]]. Der Komponentenentwickler, also unser
+Anwender, klassifiziert jeden Zugangspunkt zum Log – soll wie gewohnt
+als Logger bezeichnet werden – gemäß einer beliebigen Anzahl von
+Facetten. Damit kann die gewohnte Systematik etwa wie folgt
+nachgebildet werden:
+ 
+_Facette 1: component_
+
+Da die einzelnen Facetten hierarchisch aufgebaut sind, wird man hier
+wohl wie gewohnt verfahren und z.B. die Paketstruktur verwenden, um
+Komponenten eindeutig zu unterscheiden. So könnte man beispielsweise
+die Klasse =de.fractalqb.snol4x= definieren, die innerhalb der Facette
+=component= die Klasse =de= mit der Unterklasse =fractalqb=
+usw. repräsentiert. Hierfür würde man den /Pfad/
+
+	 =component:de.fractalqb.snol4x=
+
+schreiben. Ebenso würde ein prominentes Beispiel wie folgt
+klassifiziert
+=component:org.hibernate.connection.DriverManagerConnectionProvider=.
+Etwas spannender wird es nun mit der
+
+_Facette 2: topic_
+
+In dieser Facette könnte man die o.g. Log Level etwas geeigneter wie
+folgt anordnen:
+
+: +-+ topic:problem
+: | |
+: | +– topic:problem.warning
+: | |
+: | +– topic:problem.error
+: | |
+: | +– topic:problem.fatal
+: |
+: +-+ topic:info
+: | |
+: | +– topic:info.trace
+: | |
+: | +– topic:info.config
+: |
+: +– topic:debug
+
+Da der Aufbau einer Facette nicht vorgegeben ist, hat der Entwickler
+hier Gestaltungsfreiraum, der jedoch besser nicht überstrapaziert und
+durch Konventionen sinnvoll eingeschränkt werden sollte. Um so
+interessanter ist, dass in diesem Vorschlag die Anordnung der
+ehemaligen Log Level "warning", "error" und "fatal" verloren gegangen
+ist. Um dieses Problem zu lösen möchte ich hier ein technische
+Überlegung heranziehen: Ein =Logger= wird mit Sicherheit ein Attribut
+besitzen, dass vorgibt, ob dieser Logger gemäß seiner aktuellen
+Konfiguration eine Meldung ausgibt oder nicht. Gestaltet man dieses
+Attribut nicht als booleschen Schalter sondern – naheliegend und auch
+nicht ganz neu – als Zahl, die einen Schwellwert für die
+Dringlichkeit einer Meldung angibt, so sollte man die Facette =topic=
+so restrukturieren
+
+: +– topic:problem
+: |
+: +-+ topic:info
+: | |
+: | +– topic:info.trace
+: | |
+: | +– topic:info.config
+: |
+: +– topic:debug
+
+und Probleme mit einer entsprechenden Dringlichkeit melden, wobei
+=warning= einer geringen und =fatal= einer hohen Dringlichkeit
+entspricht.
+
+Nachdem wir nun wieder da angelangt sind, wo bestehende Logging
+Frameworks schon lange stehen, möchte ich betonen, dass mit den
+dargestellten Mitteln weiter gearbeitet werden kann, um womöglich neue
+und hilfreiche Strategien zu entwickeln.
+
+** Scala
+Für das oben beschriebene Konzept habe ich vor Jahren bereits eine
+Implementierung in C++ erstellt, die ich in kleinen
+"Spielzeugprojekten" eingesetzt habe. Wegen der eher dünnen
+Standardbibliothek von C++ hatte ich zu diesem Zweck auch einiges an
+Infrastruktur entwickeln müssen: Nachrichtenobjekte; Exception, die
+die Nachrichten verwenden; konfigurierbare Formatierung; uvam. Unterm
+Strich viele Dinge, die man heute z.B. aus der [[http://www.boost.org][Boost]] Bibliothek
+verwenden würde. Letztendlich ist diese Implementierung nun "außer
+Dienst gestellt".
+
+Für eine [[http://www.scala-lang.org][Scala]] Implementierung erhoffe ich mir derzeit (2010) genügend
+Raum, um mit dieser Idee etwas Interesse zu erlangen. Außerdem ist
+Scala eine ausgesprochen interessante Programmiersprache, die
+darüber hinaus auch noch die Möglichkeit bietet, Teile aus guten Java
+Logging Bibliotheken wieder zu verwenden.
+
+* Beispiel
+Neben der internen technischen Leistungsfähigkeit einer Logging
+Bibliothek ist auch die API für die Frage interessant, ob man die
+Bibliothek einsetzen wird oder nicht. Ist die API gut, so kann die
+Technik dahinter verbessert werden, ohne Anwendungen zu zerbrechen –
+das Risiko ist dann gering. Machen Sie sich ein Bild...
