@@ -1,7 +1,7 @@
 package de.fractalqb.snol4x
 
 class Facet private ( name: String,
-		      prioThrh: Short )
+		              prioThrh: Short )
   extends Category( name, prioThrh )
 {
   override def path: String = name + ':'
@@ -39,7 +39,8 @@ object Component {
 }
 
 object Topic {
-	def TRACE = Facet.TOPIC( "trace" )
-	def ERROR = Facet.TOPIC( "error" )
-	def DEBUG = Facet.TOPIC( "debug" )
+	val INFO =  Facet.TOPIC( "info" )
+	val TRACE = INFO get "trace"
+	val DEBUG = INFO get "debug"
+	val PROBLEM = Facet.TOPIC( "problem" )
 }

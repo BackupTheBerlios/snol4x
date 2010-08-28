@@ -126,3 +126,29 @@ Bibliothek ist auch die API für die Frage interessant, ob man die
 Bibliothek einsetzen wird oder nicht. Ist die API gut, so kann die
 Technik dahinter verbessert werden, ohne Anwendungen zu zerbrechen –
 das Risiko ist dann gering. Machen Sie sich ein Bild...
+
+_Logging für ein Paket_
+
+: package de.fractalqb.snol4x.samples
+: 
+: import de.fractalqb.snol4x._
+: 
+: object Log {
+:     val trace = Logger( Topic TRACE, // the 'trace' category in facet 'topic'
+:                         // our package in the 'component' facet:
+:                         Component( "de.fractalqb.snol4x.samples" ) )
+:     val warn = Logger( Priority UNIMPORTANT, // a low priority value
+:                        Topic PROBLEM, // the 'problem' category in facet 'topic'
+:                        Component( "de.fractalqb.snol4x.samples" ) )
+:     val error = Logger( Priority NORMAL,
+:                         Topic PROBLEM,
+:                         Component( "de.fractalqb.snol4x.samples" ) )
+:     val fatal = Logger( Priority IMPORTANT,
+:                         Topic PROBLEM,
+:                         Component( "de.fractalqb.snol4x.samples" ) )
+: 
+:     def main( args: Array[String] ) {
+:         Log.trace( Priority.NORMAL )( "doing fine" )
+:         Log.warn( "The end is near!" )
+:     }
+: }
