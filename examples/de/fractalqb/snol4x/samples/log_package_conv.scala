@@ -2,7 +2,7 @@ package de.fractalqb.snol4x.samples
 
 import de.fractalqb.snol4x._
 
-object Log {
+object LogConv {
 	val trace = Logger( Topic TRACE,
 			            Component( "de.fractalqb.snol4x.samples" ) )
 	val warn = Logger( Priority UNIMPORTANT,
@@ -16,7 +16,7 @@ object Log {
 			            Component( "de.fractalqb.snol4x.samples" ) )
 
 	def main( args: Array[String] ) {
-		Log.trace( Priority.NORMAL )( "doing fine" )
-		Log.warn( "The end is near!" )
+		LogConv.trace( Priority NORMAL )( "doing fine" )
+		LogConv.warn( "The end is near!" )
 	}
 }

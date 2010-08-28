@@ -8,6 +8,7 @@ class Logger( cat: Category, moreCats: Seq[Category] ) {
   
   def apply( prio: Short )( form: String, args: Any* ) {
 	cats foreach { c => println( c.path ) }
+	System.err.println( form format args )
   }
 }
 

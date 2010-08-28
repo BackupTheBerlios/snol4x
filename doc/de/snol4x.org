@@ -1,3 +1,4 @@
+
 * Motivation
 Was bring jemanden dazu, angesichts der allgemein verbreiteten und wohl
 auch bewährten Loggin Frameworks à la log4j, etwas neues auf einer
@@ -127,7 +128,9 @@ Bibliothek einsetzen wird oder nicht. Ist die API gut, so kann die
 Technik dahinter verbessert werden, ohne Anwendungen zu zerbrechen –
 das Risiko ist dann gering. Machen Sie sich ein Bild...
 
-_Logging für ein Paket_
+** Logging für ein Paket
+
+So kann man einen üblichen Logger "von hand" zusammenbauen:
 
 : package de.fractalqb.snol4x.samples
 : 
@@ -152,3 +155,43 @@ _Logging für ein Paket_
 :         Log.warn( "The end is near!" )
 :     }
 : }
+
+Man beachte den unterschied zwischen =Log.trace= und zum Beispiel
+=Log.warn=.
+
+- =Log.trace= :: ist ein Logger, der den Kategorien =topic:info.trace=
+                 und =component.de.fractalqb.snol4x.samples=
+                 zugeordnet ist. Nachrichten werden unter Angabe der
+                 Priorität ausgegeben. Vgl.: =Log.trace( Priority
+                 NORMAL )( ... )=
+
+- =Log.warn= :: ist ein "Logger", bei dem die Priorität fest
+                vorgegeben ist[1]. Dieser Logger gibt also nur
+                Probleme – wegen der Kategorie =topic:problem= – der
+                Priorität =UNIMPORTANT= aus. Das kann ganz plausibel
+                als =Warning= verstanden werden.
+
+Natürlich wäre es anstrengend die Logger für jedes Paket immer wieder
+mit solch einem Aufwand anlegen zu müssen. Aber hier kommt einem das
+Scala Trait =StdLogConfig= hilfreich zur Hand:
+
+: package de.fractalqb.snol4x.samples
+: 
+: import de.fractalqb.snol4x._
+: 
+: object Log extends StdLogConfig {
+:     override val componentPath = "de.fractalqb.snol4x.samples"
+:     
+:     def main( args: Array[String] ) {
+:         Log.trace( Priority NORMAL )( "doing fine" )
+:         Log.warn( "The end is near!" )
+:     }
+: }
+
+** Logging für eine Klasse
+
+
+[1] Eigentlich ist =Log.warn= eine Funktion. Sie entsteht durch Binden
+des Parameters =prio= der "curryed" Methode =Logger.apply( prio: Short
+)( ... )=.
+

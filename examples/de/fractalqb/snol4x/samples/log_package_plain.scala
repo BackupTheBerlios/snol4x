@@ -17,7 +17,7 @@ object LogPlain {
 			            Facet( "component" )( "de.fractalqb.snol4x.samples" ) )
 
 	def main( args: Array[String] ) {
-		LogPlain.trace( Priority.NORMAL )( "doing fine" )
+		LogPlain.trace( Priority NORMAL )( "doing fine" )
 		LogPlain.warn( "The end is near!" )
 	}
 }
