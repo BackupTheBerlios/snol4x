@@ -1,0 +1,22 @@
+div#top {
+    width:100%;
+    text-align:right;
+    background-color:silver;
+    padding:2px;
+}
+div#table-of-contents {
+    font-size:0.91em;
+    float:left; width:16em;
+    margin:0; padding:2px;
+    margin-top:2px;
+    border:1px solid silver;
+}
+.outline-2 {
+    margin-left:16em;
+}
+div#footnotes {
+    border:1px solid silver;
+}
+code {
+    font-size:0.85em;
+}

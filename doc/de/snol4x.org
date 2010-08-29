@@ -18,11 +18,12 @@ Logger) zu bieten, der
 Für die hierarchische Einordnung wird in Java gerne die Anordnung in
 der Paketstruktur inklusive der betreffenden Klasse genommen. Was die
 Anordnung bzgl. Wichtigkeit betrifft, so sind die üblichen
-Problemklassen – oder auch Log Level – "warning", "error" und
-"fatal" intuitiv als angeordnet zu verstehen. Bei der Bewertung von
-Log Leveln wie "info", "trace", "debug" oder "config" ist das nicht
-mehr so einfach objektiv möglich, auch wenn viele aus Gewohnheit eine
-Vorstellung dazu haben.
+Problemklassen – oder auch Log Level – "warning", "error" und "fatal"
+intuitiv als angeordnet zu verstehen. Bei der Bewertung von Log Leveln
+wie "info", "trace", "debug" oder "config" ist das nicht mehr so
+einfach objektiv möglich, auch wenn viele aus Gewohnheit eine
+Vorstellung dazu haben. Interessanterweise wird hier "[[http://www.scala-lang.org/node/2261#comment-7927][Scala Depate]]"
+etwas vergleichbares diskutiert.
 
 ** Facettenklassifikation
 Dieses Projekt möchte hierzu nun einen allgemeineren Ansatz anbieten,
