@@ -1,0 +1,383 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+lang="en" xml:lang="en">
+<head>
+<title>Snol4x's Not Log4x</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2010-08-29 16:05:00 CEST"/>
+<meta name="author" content="Marcus Perlick"/>
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  html { font-family: Times, serif; font-size: 12pt; }
+  .title  { text-align: center; }
+  .todo   { color: red; }
+  .done   { color: green; }
+  .tag    { background-color:lightblue; font-weight:normal }
+  .target { }
+  .timestamp { color: grey }
+  .timestamp-kwd { color: CadetBlue }
+  p.verse { margin-left: 3% }
+  pre {
+	border: 1pt solid #AEBDCC;
+	background-color: #F3F5F7;
+	padding: 5pt;
+	font-family: courier, monospace;
+        font-size: 90%;
+        overflow:auto;
+  }
+  table { border-collapse: collapse; }
+  td, th { vertical-align: top; }
+  dt { font-weight: bold; }
+  div.figure { padding: 0.5em; }
+  div.figure p { text-align: center; }
+  .linenr { font-size:smaller }
+  .code-highlighted {background-color:#ffff00;}
+  .org-info-js_info-navigation { border-style:none; }
+  #org-info-js_console-label { font-size:10px; font-weight:bold;
+                               white-space:nowrap; }
+  .org-info-js_search-highlight {background-color:#ffff00; color:#000000;
+                                 font-weight:bold; }
+  /*]]>*/-->
+</style><link rel="stylesheet" href="../snol4x.css" type="text/css">
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*/-->
+</script>
+</head><body>
+<h1 class="title">Snol4x's Not Log4x</h1>
+
+
+<div id="top">
+<a href="http://developer.berlios.de/projects/snol4x"
+   alt="BerliOS Project">Project</a>
+<a href="http://developer.berlios.de" title="BerliOS Developer">
+<img src="http://developer.berlios.de/bslogo.php?group_id=11957"
+ width="124px" height="32px" border="0" style="vertical-align:text-top"
+ alt="BerliOS Developer Logo"></a>
+</div>
+
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">Motivation </a>
+<ul>
+<li><a href="#sec-1.1">Facettenklassifikation </a></li>
+<li><a href="#sec-1.2">Scala </a></li>
+</ul>
+</li>
+<li><a href="#sec-2">Beispiel </a>
+<ul>
+<li><a href="#sec-2.1">Logging für ein Paket </a></li>
+<li><a href="#sec-2.2">Logging für eine Klasse </a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1">Motivation </h2>
+<div id="text-1">
+
+<p>Was bring jemanden dazu, angesichts der allgemein verbreiteten und wohl
+auch bewährten Loggin Frameworks à la log4j, etwas neues auf einer
+(relativ) grünen Wiese zu bauen?
+</p>
+<p>
+Ausschlaggebend war die Frage, wie einzelne Log Einträge bei der
+Entwicklung von Komponenten so zu klassifizieren sind, dass sie in
+einer fertigen Anwendung gut konfigurierbar werden. Das gängige
+Vorgehen besteht darin, dem Entwickler – also dem Anwender des
+Logging Framewroks – <i>einen</i> Zugangspunkt zum Log (vgl. log4j:
+Logger) zu bieten, der
+</p>
+<ol>
+<li>
+in einem hierarchischen Namensraum eindeutig angesiedelt und
+
+</li>
+<li>
+bzw. seiner "Wichtigkeit" global geordnet ist.
+
+</li>
+</ol>
+
+<p>Für die hierarchische Einordnung wird in Java gerne die Anordnung in
+der Paketstruktur inklusive der betreffenden Klasse genommen. Was die
+Anordnung bzgl. Wichtigkeit betrifft, so sind die üblichen
+Problemklassen – oder auch Log Level – "warning", "error" und "fatal"
+intuitiv als angeordnet zu verstehen. Bei der Bewertung von Log Leveln
+wie "info", "trace", "debug" oder "config" ist das nicht mehr so
+einfach objektiv möglich, auch wenn viele aus Gewohnheit eine
+Vorstellung dazu haben. Interessanterweise wird hier "<a href="http://www.scala-lang.org/node/2261#comment-7927">Scala Debate</a>"
+etwas vergleichbares diskutiert.
+</p>
+
+</div>
+
+<div id="outline-container-1.1" class="outline-3">
+<h3 id="sec-1.1">Facettenklassifikation </h3>
+<div id="text-1.1">
+
+<p>Dieses Projekt möchte hierzu nun einen allgemeineren Ansatz anbieten,
+der es obendrein erlaubt das bisher übliche Konzept zur
+Klassifizierung von Log Einträgen nachzubilden. Das Stichwort hierzu
+lautet <a href="http://de.wikipedia.org/wiki/Facettenklassifikation">Facettenklassifikation</a>. Der Komponentenentwickler, also unser
+Anwender, klassifiziert jeden Zugangspunkt zum Log – soll wie gewohnt
+als Logger bezeichnet werden – gemäß einer beliebigen Anzahl von
+Facetten. Damit kann die gewohnte Systematik etwa wie folgt
+nachgebildet werden:
+</p>
+<p>
+<span style="text-decoration:underline;">Facette 1: component</span>
+</p>
+<p>
+Da die einzelnen Facetten hierarchisch aufgebaut sind, wird man hier
+wohl wie gewohnt verfahren und z.B. die Paketstruktur verwenden, um
+Komponenten eindeutig zu unterscheiden. So könnte man beispielsweise
+die Klasse <code>de.fractalqb.snol4x</code> definieren, die innerhalb der Facette
+<code>component</code> die Klasse <code>de</code> mit der Unterklasse <code>fractalqb</code>
+usw. repräsentiert. Hierfür würde man den <i>Pfad</i>
+</p>
+<p>
+<code>component:de.fractalqb.snol4x</code>
+</p>
+<p>
+schreiben. Ebenso würde ein prominentes Beispiel wie folgt
+klassifiziert
+<code>component:org.hibernate.connection.DriverManagerConnectionProvider</code>.
+Etwas spannender wird es nun mit der
+</p>
+<p>
+<span style="text-decoration:underline;">Facette 2: topic</span>
+</p>
+<p>
+In dieser Facette könnte man die o.g. Log Level etwas geeigneter wie
+folgt anordnen:
+</p>
+<pre class="example">
++-+ topic:problem
+| |
+| +– topic:problem.warning
+| |
+| +– topic:problem.error
+| |
+| +– topic:problem.fatal
+|
++-+ topic:info
+| |
+| +– topic:info.trace
+| |
+| +– topic:info.config
+|
++– topic:debug
+</pre>
+
+<p>
+Da der Aufbau einer Facette nicht vorgegeben ist, hat der Entwickler
+hier Gestaltungsfreiraum, der jedoch besser nicht überstrapaziert und
+durch Konventionen sinnvoll eingeschränkt werden sollte. Um so
+interessanter ist, dass in diesem Vorschlag die Anordnung der
+ehemaligen Log Level "warning", "error" und "fatal" verloren gegangen
+ist. Um dieses Problem zu lösen möchte ich hier ein technische
+Überlegung heranziehen: Ein <code>Logger</code> wird mit Sicherheit ein Attribut
+besitzen, dass vorgibt, ob dieser Logger gemäß seiner aktuellen
+Konfiguration eine Meldung ausgibt oder nicht. Gestaltet man dieses
+Attribut nicht als booleschen Schalter sondern – naheliegend und auch
+nicht ganz neu – als Zahl, die einen Schwellwert für die
+Dringlichkeit einer Meldung angibt, so sollte man die Facette <code>topic</code>
+so restrukturieren
+</p>
+<pre class="example">
++– topic:problem
+|
++-+ topic:info
+| |
+| +– topic:info.trace
+| |
+| +– topic:info.config
+|
++– topic:debug
+</pre>
+
+<p>
+und Probleme mit einer entsprechenden Dringlichkeit melden, wobei
+<code>warning</code> einer geringen und <code>fatal</code> einer hohen Dringlichkeit
+entspricht.
+</p>
+<p>
+Nachdem wir nun wieder da angelangt sind, wo bestehende Logging
+Frameworks schon lange stehen, möchte ich betonen, dass mit den
+dargestellten Mitteln weiter gearbeitet werden kann, um womöglich neue
+und hilfreiche Strategien zu entwickeln. Eine formalere Beschreibung
+des Konzepts findet man im <a href="../en/model.html">UML Modell</a>.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.2" class="outline-3">
+<h3 id="sec-1.2">Scala </h3>
+<div id="text-1.2">
+
+<p>Für das oben beschriebene Konzept habe ich vor Jahren bereits eine
+Implementierung in C++ erstellt, die ich in kleinen
+"Spielzeugprojekten" eingesetzt habe. Wegen der eher dünnen
+Standardbibliothek von C++ hatte ich zu diesem Zweck auch einiges an
+Infrastruktur entwickeln müssen: Nachrichtenobjekte; Exception, die
+die Nachrichten verwenden; konfigurierbare Formatierung; uvam. Unterm
+Strich viele Dinge, die man heute z.B. aus der <a href="http://www.boost.org">Boost</a> Bibliothek
+verwenden würde. Letztendlich ist diese Implementierung nun "außer
+Dienst gestellt".
+</p>
+<p>
+Für eine <a href="http://www.scala-lang.org">Scala</a> Implementierung erhoffe ich mir derzeit (2010) genügend
+Raum, um mit dieser Idee etwas Interesse zu erlangen. Außerdem ist
+Scala eine ausgesprochen interessante Programmiersprache, die
+darüber hinaus auch noch die Möglichkeit bietet, Teile aus guten Java
+Logging Bibliotheken wieder zu verwenden.
+</p>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2">Beispiel </h2>
+<div id="text-2">
+
+<p>Neben der internen technischen Leistungsfähigkeit einer Logging
+Bibliothek ist auch die API für die Frage interessant, ob man die
+Bibliothek einsetzen wird oder nicht. Ist die API gut, so kann die
+Technik dahinter verbessert werden, ohne Anwendungen zu zerbrechen –
+das Risiko ist dann gering. Machen Sie sich ein Bild&hellip;
+</p>
+
+</div>
+
+<div id="outline-container-2.1" class="outline-3">
+<h3 id="sec-2.1">Logging für ein Paket </h3>
+<div id="text-2.1">
+
+
+<p>
+So kann man einen üblichen Logger "von hand" zusammenbauen:
+</p>
+<pre class="example">
+package de.fractalqb.snol4x.samples
+
+import de.fractalqb.snol4x._
+
+object Log {
+    val trace = Logger( Topic TRACE, // the 'trace' category in facet 'topic'
+                        // our package in the 'component' facet:
+                        Component( "de.fractalqb.snol4x.samples" ) )
+    val warn = Logger( Priority UNIMPORTANT, // a low priority value
+                       Topic PROBLEM, // the 'problem' category in facet 'topic'
+                       Component( "de.fractalqb.snol4x.samples" ) )
+    val error = Logger( Priority NORMAL,
+                        Topic PROBLEM,
+                        Component( "de.fractalqb.snol4x.samples" ) )
+    val fatal = Logger( Priority IMPORTANT,
+                        Topic PROBLEM,
+                        Component( "de.fractalqb.snol4x.samples" ) )
+
+    def main( args: Array[String] ) {
+        Log.trace( Priority.NORMAL )( "doing fine" )
+        Log.warn( "The end is near!" )
+    }
+}
+</pre>
+
+<p>
+Man beachte den unterschied zwischen <code>Log.trace</code> und zum Beispiel
+<code>Log.warn</code>.
+</p>
+<dl>
+<dt><code>Log.trace</code></dt><dd>
+ist ein Logger, der den Kategorien <code>topic:info.trace</code>
+und <code>component.de.fractalqb.snol4x.samples</code>
+zugeordnet ist. Nachrichten werden unter Angabe der
+Priorität ausgegeben. Vgl.: <code>Log.trace( Priority                  NORMAL )( ... )</code>
+
+</dd>
+<dt><code>Log.warn</code></dt><dd>
+ist ein "Logger", bei dem die Priorität fest
+vorgegeben ist<sup><a class="footref" name="fnr.1" href="#fn.1">1</a></sup>. Dieser Logger gibt also nur
+Probleme – wegen der Kategorie <code>topic:problem</code> – der
+Priorität <code>UNIMPORTANT</code> aus. Das kann ganz plausibel
+als <code>Warning</code> verstanden werden.
+
+</dd>
+</dl>
+
+<p>Natürlich wäre es anstrengend die Logger für jedes Paket immer wieder
+mit solch einem Aufwand anlegen zu müssen. Aber hier kommt einem das
+Scala Trait <code>StdLogConfig</code> hilfreich zur Hand:
+</p>
+<pre class="example">
+package de.fractalqb.snol4x.samples
+
+import de.fractalqb.snol4x._
+
+object Log extends StdLogConfig {
+    override val componentPath = "de.fractalqb.snol4x.samples"
+    
+    def main( args: Array[String] ) {
+        Log.trace( Priority NORMAL )( "doing fine" )
+        Log.warn( "The end is near!" )
+    }
+}
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-2.2" class="outline-3">
+<h3 id="sec-2.2">Logging für eine Klasse </h3>
+<div id="text-2.2">
+
+
+
+
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+<p class="footnote"><sup><a class="footnum" name="fn.1" href="#fnr.1">1</a></sup> Eigentlich ist <code>Log.warn</code> eine Funktion. Sie entsteht durch Binden
+des Parameters <code>prio</code> der "curryed" Methode <code>Logger.apply( prio: Short )( ... )</code>.
+</p>
+</div>
+</div>
+<div id="postamble"><p class="author"> Author: Marcus Perlick
+<a href="mailto:riffraff@users.berlios.de">&lt;riffraff@users.berlios.de&gt;</a>
+</p>
+<p class="date"> Date: 2010-08-29 16:05:00 CEST</p>
+<p>HTML generated by org-mode 6.21b in emacs 23</p>
+</div></body>
+</html>
