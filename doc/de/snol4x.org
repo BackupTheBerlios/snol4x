@@ -1,6 +1,7 @@
 Snol4x's Not Log4x
 #+BEGIN_HTML
 <div id="top">
+<a href="../en/snol4x.html">english</a>
 <a href="http://developer.berlios.de/projects/snol4x"
    alt="BerliOS Project">Project</a>
 <a href="http://developer.berlios.de" title="BerliOS Developer">

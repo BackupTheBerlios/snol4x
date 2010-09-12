@@ -6,7 +6,7 @@ lang="en" xml:lang="en">
 <title>Snol4x's Not Log4x</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2010-09-01 20:13:26 CEST"/>
+<meta name="generated" content="2010-09-01 20:09:41 CEST"/>
 <meta name="author" content="Marcus Perlick"/>
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
@@ -68,7 +68,7 @@ lang="en" xml:lang="en">
 
 
 <div id="top">
-<a href="../en/snol4x.html">english</a>
+<a href="../de/snol4x.html">deutsch</a>
 <a href="http://developer.berlios.de/projects/snol4x"
    alt="BerliOS Project">Project</a>
 <a href="http://developer.berlios.de" title="BerliOS Developer">
@@ -82,10 +82,10 @@ lang="en" xml:lang="en">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">Motivation </a>
+<li><a href="#sec-1">Rationale </a>
 <ul>
-<li><a href="#sec-1.1">Facettenklassifikation </a></li>
-<li><a href="#sec-1.2">Scala </a></li>
+<li><a href="#sec-1.1">Faceted Classification </a></li>
+<li><a href="#sec-1.2">Why Scala </a></li>
 </ul>
 </li>
 <li><a href="#sec-2">Beispiel </a>
@@ -99,84 +99,87 @@ lang="en" xml:lang="en">
 </div>
 
 <div id="outline-container-1" class="outline-2">
-<h2 id="sec-1">Motivation </h2>
+<h2 id="sec-1">Rationale </h2>
 <div id="text-1">
 
-<p>Was bring jemanden dazu, angesichts der allgemein verbreiteten und wohl
-auch bewährten Loggin Frameworks à la log4j, etwas neues auf einer
-(relativ) grünen Wiese zu bauen?
-</p>
-<p>
-Ausschlaggebend war die Frage, wie einzelne Log Einträge bei der
-Entwicklung von Komponenten so zu klassifizieren sind, dass sie in
-einer fertigen Anwendung gut konfigurierbar werden. Das gängige
-Vorgehen besteht darin, dem Entwickler – also dem Anwender des
-Logging Framewroks – <i>einen</i> Zugangspunkt zum Log (vgl. log4j:
-Logger) zu bieten, der
+<p>Why should anyone create a new logging framework in the presence of
+such well-established frameworks as log4j, etc?  The bone of
+contention was the question how to classify logging events during the
+development of some software component so that they are easy to select
+and configure in a complete application – maybe assembled from many
+such components. The popular solution for this problem is to give the
+developer distinct access points to emit logging messages (cf. log4j
+Logger) and to
 </p>
 <ol>
 <li>
-in einem hierarchischen Namensraum eindeutig angesiedelt und
+put those access points into unique places within a hierarchical
+namespace and
 
 </li>
 <li>
-bzw. seiner "Wichtigkeit" global geordnet ist.
+to place each message into a total order by giving the some level
+of “importance”, aka. priority.
 
 </li>
 </ol>
 
-<p>Für die hierarchische Einordnung wird in Java gerne die Anordnung in
-der Paketstruktur inklusive der betreffenden Klasse genommen. Was die
-Anordnung bzgl. Wichtigkeit betrifft, so sind die üblichen
-Problemklassen – oder auch Log Level – "warning", "error" und "fatal"
-intuitiv als angeordnet zu verstehen. Bei der Bewertung von Log Leveln
-wie "info", "trace", "debug" oder "config" ist das nicht mehr so
-einfach objektiv möglich, auch wenn viele aus Gewohnheit eine
-Vorstellung dazu haben. Interessanterweise wird hier "<a href="http://www.scala-lang.org/node/2261#comment-7927">Scala Debate</a>"
-etwas vergleichbares diskutiert.
+<p>Note that for the hierarchical namespace it is common today to use the
+package namespace of the component that emits its messages through the
+access points. The “level of importance” is generally known as <i>log level</i> and there are different – but similar – sets of such log
+levels, e.g. “warning”, “error”, “fatal error”, “debug”, “info”,
+“trace” and “config”. Considering “warning”, “error” and “fatal error”
+ist is quite obvious and intuitive, why there is a total ordering. But
+for “debug”, “info”, “trace” and “config” I never found a really good
+explanation why they should be ordered at all – even if a lot of
+people could give them an order by habit.
+</p>
+<p>
+Recently I came across a discussion on "<a href="http://www.scala-lang.org/node/2261#comment-7927">Scala Debate</a>" that, in my
+opinion, expresses the need for something more general. Perhaps this
+project can offer as suitable solution:
 </p>
 
 </div>
 
 <div id="outline-container-1.1" class="outline-3">
-<h3 id="sec-1.1">Facettenklassifikation </h3>
+<h3 id="sec-1.1">Faceted Classification </h3>
 <div id="text-1.1">
 
-<p>Dieses Projekt möchte hierzu nun einen allgemeineren Ansatz anbieten,
-der es obendrein erlaubt das bisher übliche Konzept zur
-Klassifizierung von Log Einträgen nachzubilden. Das Stichwort hierzu
-lautet <a href="http://de.wikipedia.org/wiki/Facettenklassifikation">Facettenklassifikation</a>. Der Komponentenentwickler, also unser
-Anwender, klassifiziert jeden Zugangspunkt zum Log – soll wie gewohnt
-als Logger bezeichnet werden – gemäß einer beliebigen Anzahl von
-Facetten. Damit kann die gewohnte Systematik etwa wie folgt
-nachgebildet werden:
+<p>The primary goal of this project is to offer a more general approach
+for the classification of log messages. This approach will allow to
+mimic the “old” convention that was described above as well as
+building new structures. Our catchword is <i>faceted classification</i>. With this approach each logger (we will now call the
+abovementioned access points “logger” – as other framework do) is
+classified by an arbitrary number of aspects, aka. <i>facets</i>. Each
+facet is a hierarchical namespace. We will call the nodes of that
+hierarchy <i>category</i>.  Using this we can emulate old logging systems
+with the two facets <code>component</code> and <code>topic</code>:
 </p>
 <p>
-<span style="text-decoration:underline;">Facette 1: component</span>
+<span style="text-decoration:underline;">Facet 1: component</span>
 </p>
 <p>
-Da die einzelnen Facetten hierarchisch aufgebaut sind, wird man hier
-wohl wie gewohnt verfahren und z.B. die Paketstruktur verwenden, um
-Komponenten eindeutig zu unterscheiden. So könnte man beispielsweise
-die Klasse <code>de.fractalqb.snol4x</code> definieren, die innerhalb der Facette
-<code>component</code> die Klasse <code>de</code> mit der Unterklasse <code>fractalqb</code>
-usw. repräsentiert. Hierfür würde man den <i>Pfad</i>
+This is nothing special. The hierarchy of the facet <code>component</code>
+follows the package namespace of the target platform, i.e. Java or
+Scala packages or even .NET or C++ namespaces. So the package
+<code>de.fractalqb.snol4x</code> would be represented by the category <code>de</code> in the
+facet <code>component</code>. Category <code>de</code> contains a subcategory <code>fractalqb</code>
+which contains another subcategory <code>snol4x</code>. For this configuration we
+write the path:
 </p>
 <p>
 <code>component:de.fractalqb.snol4x</code>
 </p>
 <p>
-schreiben. Ebenso würde ein prominentes Beispiel wie folgt
-klassifiziert
-<code>component:org.hibernate.connection.DriverManagerConnectionProvider</code>.
-Etwas spannender wird es nun mit der
+This was not too exiting. But it gets more interesting with
 </p>
 <p>
-<span style="text-decoration:underline;">Facette 2: topic</span>
+<span style="text-decoration:underline;">Facet2: topic</span>
 </p>
 <p>
-In dieser Facette könnte man die o.g. Log Level etwas geeigneter wie
-folgt anordnen:
+We will use this facet to organize out log levels. A first idea could
+be to build a hierarchy like this:
 </p>
 <pre class="example">
 +-+ topic:problem
@@ -197,19 +200,21 @@ folgt anordnen:
 </pre>
 
 <p>
-Da der Aufbau einer Facette nicht vorgegeben ist, hat der Entwickler
-hier Gestaltungsfreiraum, der jedoch besser nicht überstrapaziert und
-durch Konventionen sinnvoll eingeschränkt werden sollte. Um so
-interessanter ist, dass in diesem Vorschlag die Anordnung der
-ehemaligen Log Level "warning", "error" und "fatal" verloren gegangen
-ist. Um dieses Problem zu lösen möchte ich hier ein technische
-Überlegung heranziehen: Ein <code>Logger</code> wird mit Sicherheit ein Attribut
-besitzen, dass vorgibt, ob dieser Logger gemäß seiner aktuellen
-Konfiguration eine Meldung ausgibt oder nicht. Gestaltet man dieses
-Attribut nicht als booleschen Schalter sondern – naheliegend und auch
-nicht ganz neu – als Zahl, die einen Schwellwert für die
-Dringlichkeit einer Meldung angibt, so sollte man die Facette <code>topic</code>
-so restrukturieren
+Remember that this would be a convention, every user of the logging
+framework, i.e. a component developer, could decide to do it another
+way – even in another facet of set of facets. But we will try to
+suggest a reasonable replacement for the “good” old log levels. An
+interesting aspect with our first idea is, that we lost he total
+ordering of the log levels, especially of <code>warning</code>, <code>error</code> and
+<code>fatal error</code>. Exactly for these log levels the total ordering felt
+quite natural, so we do not want to lose it here. This is the point,
+where a technical consideration comes to help. Surely a logger will
+have some sort of attribute that indicates whether it was configured
+to issue message or to “keep silent”. When we implement this attribute
+as a number instead of a boolean switch, we can interpret that number
+as a threshold for the “importance” of a message that has to be
+exceeded before that message will be issued. Now we can reorganize the
+<code>topic</code> facet:
 </p>
 <pre class="example">
 +– topic:problem
@@ -224,41 +229,43 @@ so restrukturieren
 </pre>
 
 <p>
-und Probleme mit einer entsprechenden Dringlichkeit melden, wobei
-<code>warning</code> einer geringen und <code>fatal</code> einer hohen Dringlichkeit
-entspricht.
+And everything we previously logged to <code>warning</code> , <code>error</code> and <code>fatal error</code> will be logged to the single category <code>topic:problem</code>. Warnings
+will be logged with a low “importance”, called <i>priority</i> in the
+following, and fatal errors with a high priority.
 </p>
 <p>
-Nachdem wir nun wieder da angelangt sind, wo bestehende Logging
-Frameworks schon lange stehen, möchte ich betonen, dass mit den
-dargestellten Mitteln weiter gearbeitet werden kann, um womöglich neue
-und hilfreiche Strategien zu entwickeln. Eine formalere Beschreibung
-des Konzepts findet man im <a href="../en/model.html">UML Modell</a>.
+After all we got to a state where existing logging frameworks have
+been long before. But remember, this is a special configuration of a
+very general concept. The change will only pay off for those that have
+needs that go beyond existing conventions. One can find a more formal
+description of the concept in the <a href="../en/model.html">UML Model</a>.
 </p>
+
 </div>
 
 </div>
 
 <div id="outline-container-1.2" class="outline-3">
-<h3 id="sec-1.2">Scala </h3>
+<h3 id="sec-1.2">Why Scala </h3>
 <div id="text-1.2">
 
-<p>Für das oben beschriebene Konzept habe ich vor Jahren bereits eine
-Implementierung in C++ erstellt, die ich in kleinen
-"Spielzeugprojekten" eingesetzt habe. Wegen der eher dünnen
-Standardbibliothek von C++ hatte ich zu diesem Zweck auch einiges an
-Infrastruktur entwickeln müssen: Nachrichtenobjekte; Exception, die
-die Nachrichten verwenden; konfigurierbare Formatierung; uvam. Unterm
-Strich viele Dinge, die man heute z.B. aus der <a href="http://www.boost.org">Boost</a> Bibliothek
-verwenden würde. Letztendlich ist diese Implementierung nun "außer
-Dienst gestellt".
+<p>Years ago I implemented the described concept in C++ and liked to use
+it in some personal “toy” projects. In that days only the STL was a
+dependable basis for the implementation and I hat to do a lot of
+things myself. Now that the <a href="http://www.boost.org">boost library</a> could be considered a de
+facto standard, that C++ thing could be based on STL and boost
+resulting in a major rewrite. At last, the library was discharged.
 </p>
 <p>
-Für eine <a href="http://www.scala-lang.org">Scala</a> Implementierung erhoffe ich mir derzeit (2010) genügend
-Raum, um mit dieser Idee etwas Interesse zu erlangen. Außerdem ist
-Scala eine ausgesprochen interessante Programmiersprache, die
-darüber hinaus auch noch die Möglichkeit bietet, Teile aus guten Java
-Logging Bibliotheken wieder zu verwenden.
+But perhaps there is some room for the concept in the Scala
+world. Especially when considering that Scala targets the Java runtime
+as well as the .NET runtime, a common API that can be mapped to both
+worlds would make Scala more universal. Beyond that, Scala is a very
+interesting programming language and its integration with the target
+platform gives us the chance to reuse parts of existing frameworks.
+</p>
+<p>
+<i>To Be Translated&hellip;</i>
 </p>
 </div>
 </div>
@@ -378,7 +385,7 @@ des Parameters <code>prio</code> der "curryed" Methode <code>Logger.apply( prio:
 <div id="postamble"><p class="author"> Author: Marcus Perlick
 <a href="mailto:riffraff@users.berlios.de">&lt;riffraff@users.berlios.de&gt;</a>
 </p>
-<p class="date"> Date: 2010-09-01 20:13:26 CEST</p>
+<p class="date"> Date: 2010-09-01 20:09:41 CEST</p>
 <p>HTML generated by org-mode 6.21b in emacs 23</p>
 </div></body>
 </html>

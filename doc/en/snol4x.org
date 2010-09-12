@@ -1,0 +1,220 @@
+Snol4x's Not Log4x
+#+BEGIN_HTML
+<div id="top">
+<a href="../de/snol4x.html">deutsch</a>
+<a href="http://developer.berlios.de/projects/snol4x"
+   alt="BerliOS Project">Project</a>
+<a href="http://developer.berlios.de" title="BerliOS Developer">
+<img src="http://developer.berlios.de/bslogo.php?group_id=11957"
+ width="124px" height="32px" border="0" style="vertical-align:text-top"
+ alt="BerliOS Developer Logo"></a>
+</div>
+#+END_HTML
+
+* Rationale
+Why should anyone create a new logging framework in the presence of
+such well-established frameworks as log4j, etc?  The bone of
+contention was the question how to classify logging events during the
+development of some software component so that they are easy to select
+and configure in a complete application – maybe assembled from many
+such components. The popular solution for this problem is to give the
+developer distinct access points to emit logging messages (cf. log4j
+Logger) and to
+
+1) put those access points into unique places within a hierarchical
+   namespace and
+
+2) to place each message into a total order by giving the some level
+   of “importance”, aka. priority.
+
+Note that for the hierarchical namespace it is common today to use the
+package namespace of the component that emits its messages through the
+access points. The “level of importance” is generally known as /log
+level/ and there are different – but similar – sets of such log
+levels, e.g. “warning”, “error”, “fatal error”, “debug”, “info”,
+“trace” and “config”. Considering “warning”, “error” and “fatal error”
+ist is quite obvious and intuitive, why there is a total ordering. But
+for “debug”, “info”, “trace” and “config” I never found a really good
+explanation why they should be ordered at all – even if a lot of
+people could give them an order by habit.
+
+Recently I came across a discussion on "[[http://www.scala-lang.org/node/2261#comment-7927][Scala Debate]]" that, in my
+opinion, expresses the need for something more general. Perhaps this
+project can offer as suitable solution:
+
+** Faceted Classification
+The primary goal of this project is to offer a more general approach
+for the classification of log messages. This approach will allow to
+mimic the “old” convention that was described above as well as
+building new structures. Our catchword is /faceted
+classification/. With this approach each logger (we will now call the
+abovementioned access points “logger” – as other framework do) is
+classified by an arbitrary number of aspects, aka. /facets/. Each
+facet is a hierarchical namespace. We will call the nodes of that
+hierarchy /category/.  Using this we can emulate old logging systems
+with the two facets =component= and =topic=:
+
+_Facet 1: component_
+
+This is nothing special. The hierarchy of the facet =component=
+follows the package namespace of the target platform, i.e. Java or
+Scala packages or even .NET or C++ namespaces. So the package
+=de.fractalqb.snol4x= would be represented by the category =de= in the
+facet =component=. Category =de= contains a subcategory =fractalqb=
+which contains another subcategory =snol4x=. For this configuration we
+write the path:
+
+	=component:de.fractalqb.snol4x=
+
+This was not too exiting. But it gets more interesting with
+
+_Facet2: topic_
+
+We will use this facet to organize out log levels. A first idea could
+be to build a hierarchy like this:
+
+: +-+ topic:problem
+: | |
+: | +– topic:problem.warning
+: | |
+: | +– topic:problem.error
+: | |
+: | +– topic:problem.fatal
+: |
+: +-+ topic:info
+: | |
+: | +– topic:info.trace
+: | |
+: | +– topic:info.config
+: |
+: +– topic:debug
+
+Remember that this would be a convention, every user of the logging
+framework, i.e. a component developer, could decide to do it another
+way – even in another facet of set of facets. But we will try to
+suggest a reasonable replacement for the “good” old log levels. An
+interesting aspect with our first idea is, that we lost he total
+ordering of the log levels, especially of =warning=, =error= and
+=fatal error=. Exactly for these log levels the total ordering felt
+quite natural, so we do not want to lose it here. This is the point,
+where a technical consideration comes to help. Surely a logger will
+have some sort of attribute that indicates whether it was configured
+to issue message or to “keep silent”. When we implement this attribute
+as a number instead of a boolean switch, we can interpret that number
+as a threshold for the “importance” of a message that has to be
+exceeded before that message will be issued. Now we can reorganize the
+=topic= facet:
+
+: +– topic:problem
+: |
+: +-+ topic:info
+: | |
+: | +– topic:info.trace
+: | |
+: | +– topic:info.config
+: |
+: +– topic:debug
+
+And everything we previously logged to =warning= , =error= and =fatal
+error= will be logged to the single category =topic:problem=. Warnings
+will be logged with a low “importance”, called /priority/ in the
+following, and fatal errors with a high priority.
+
+After all we got to a state where existing logging frameworks have
+been long before. But remember, this is a special configuration of a
+very general concept. The change will only pay off for those that have
+needs that go beyond existing conventions. One can find a more formal
+description of the concept in the [[file:../en/model.org::*Faceted Classification][UML Model]].
+
+
+** Why Scala
+Years ago I implemented the described concept in C++ and liked to use
+it in some personal “toy” projects. In that days only the STL was a
+dependable basis for the implementation and I hat to do a lot of
+things myself. Now that the [[http://www.boost.org][boost library]] could be considered a de
+facto standard, that C++ thing could be based on STL and boost
+resulting in a major rewrite. At last, the library was discharged.
+
+But perhaps there is some room for the concept in the Scala
+world. Especially when considering that Scala targets the Java runtime
+as well as the .NET runtime, a common API that can be mapped to both
+worlds would make Scala more universal. Beyond that, Scala is a very
+interesting programming language and its integration with the target
+platform gives us the chance to reuse parts of existing frameworks.
+
+/To Be Translated.../
+
+* Beispiel
+Neben der internen technischen Leistungsfähigkeit einer Logging
+Bibliothek ist auch die API für die Frage interessant, ob man die
+Bibliothek einsetzen wird oder nicht. Ist die API gut, so kann die
+Technik dahinter verbessert werden, ohne Anwendungen zu zerbrechen –
+das Risiko ist dann gering. Machen Sie sich ein Bild...
+
+** Logging für ein Paket
+
+So kann man einen üblichen Logger "von hand" zusammenbauen:
+
+: package de.fractalqb.snol4x.samples
+: 
+: import de.fractalqb.snol4x._
+: 
+: object Log {
+:     val trace = Logger( Topic TRACE, // the 'trace' category in facet 'topic'
+:                         // our package in the 'component' facet:
+:                         Component( "de.fractalqb.snol4x.samples" ) )
+:     val warn = Logger( Priority UNIMPORTANT, // a low priority value
+:                        Topic PROBLEM, // the 'problem' category in facet 'topic'
+:                        Component( "de.fractalqb.snol4x.samples" ) )
+:     val error = Logger( Priority NORMAL,
+:                         Topic PROBLEM,
+:                         Component( "de.fractalqb.snol4x.samples" ) )
+:     val fatal = Logger( Priority IMPORTANT,
+:                         Topic PROBLEM,
+:                         Component( "de.fractalqb.snol4x.samples" ) )
+: 
+:     def main( args: Array[String] ) {
+:         Log.trace( Priority.NORMAL )( "doing fine" )
+:         Log.warn( "The end is near!" )
+:     }
+: }
+
+Man beachte den unterschied zwischen =Log.trace= und zum Beispiel
+=Log.warn=.
+
+- =Log.trace= :: ist ein Logger, der den Kategorien =topic:info.trace=
+                 und =component.de.fractalqb.snol4x.samples=
+                 zugeordnet ist. Nachrichten werden unter Angabe der
+                 Priorität ausgegeben. Vgl.: =Log.trace( Priority
+                 NORMAL )( ... )=
+
+- =Log.warn= :: ist ein "Logger", bei dem die Priorität fest
+                vorgegeben ist[1]. Dieser Logger gibt also nur
+                Probleme – wegen der Kategorie =topic:problem= – der
+                Priorität =UNIMPORTANT= aus. Das kann ganz plausibel
+                als =Warning= verstanden werden.
+
+Natürlich wäre es anstrengend die Logger für jedes Paket immer wieder
+mit solch einem Aufwand anlegen zu müssen. Aber hier kommt einem das
+Scala Trait =StdLogConfig= hilfreich zur Hand:
+
+: package de.fractalqb.snol4x.samples
+: 
+: import de.fractalqb.snol4x._
+: 
+: object Log extends StdLogConfig {
+:     override val componentPath = "de.fractalqb.snol4x.samples"
+:     
+:     def main( args: Array[String] ) {
+:         Log.trace( Priority NORMAL )( "doing fine" )
+:         Log.warn( "The end is near!" )
+:     }
+: }
+
+** Logging für eine Klasse
+
+
+[1] Eigentlich ist =Log.warn= eine Funktion. Sie entsteht durch Binden
+des Parameters =prio= der "curryed" Methode =Logger.apply( prio: Short
+)( ... )=.
+

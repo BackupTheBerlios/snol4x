@@ -1,10 +1,17 @@
 package de.fractalqb.snol4x
 
+import scala.collection.immutable.SortedSet
+
 abstract class Category( val name: String,
 						 var prioThreshold: Short )
   extends Equals
 {
-  private var subs = Set.empty[SubCategory]
+  private var subs: Set[SubCategory] = SortedSet.empty[SubCategory] {
+	new Ordering[SubCategory] {
+		override def compare( sc1: SubCategory, sc2: SubCategory ): Int =
+			sc1.name compare sc2.name
+	}
+  }
   private[snol4x] var logrs = Set.empty[Logger]
 
   def path: String
@@ -31,8 +38,4 @@ abstract class Category( val name: String,
 	
   override def canEqual( that: Any ): Boolean =
 	that.isInstanceOf[Category]
-
-  override def equals( that: Any ): Boolean =
-	if ( canEqual( that ) ) name == that.asInstanceOf[Category].name
-	else false
 }
