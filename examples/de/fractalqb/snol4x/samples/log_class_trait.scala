@@ -13,6 +13,6 @@ object SomeClass extends StdLogConfig {
 
 class SomeClass {
 	def fun() {
-		SomeClass.trace( Priority NORMAL )( "fun(%1$d) was called", 7 )
+		SomeClass.trace( Priority NORMAL )( "fun(%1$d) was called", Integer.valueOf( 7 ) )
 	}
 }
