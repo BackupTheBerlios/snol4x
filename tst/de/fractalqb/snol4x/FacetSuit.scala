@@ -1,22 +1,11 @@
 package de.fractalqb.snol4x
 
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.junit.AssertionsForJUnit
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.scalatest.junit.JUnit3Suite
 
-@RunWith(classOf[JUnitRunner])
-class FacetSuite extends AssertionsForJUnit {
+class FacetSuite extends JUnit3Suite {
 
-	@Test
-	def facetCreation {
+	def testFacetCreation {
 		val someFacte = Facet( "some-facet" )
 		Facet.all.foreach( f => println( f.name ) )
-	}
-}
-
-object TestIt {
-	def main( args: Array[String] ) {
-		(new FacetSuite).facetCreation
 	}
 }
