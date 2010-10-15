@@ -183,7 +183,7 @@ Man beachte den unterschied zwischen =Log.trace= und zum Beispiel
 =Log.warn=.
 
 - =Log.trace= :: ist ein Logger, der den Kategorien =topic:info.trace=
-                 und =component.de.fractalqb.snol4x.samples=
+                 und =component:de.fractalqb.snol4x.samples=
                  zugeordnet ist. Nachrichten werden unter Angabe der
                  Priorität ausgegeben. Vgl.: =Log.trace( Priority
                  NORMAL )( ... )=

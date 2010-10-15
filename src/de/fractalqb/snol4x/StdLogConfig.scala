@@ -14,6 +14,5 @@ trait StdLogConfig {
 }
 
 object StdLogConfig {
-	def pathFor[T]: String = typeOf[T].getName
-	http://scala-programming-language.1934581.n4.nabble.com/How-do-I-get-the-class-of-a-Generic-td1944789.html
+	def pathFor[T]()( implicit mT: Manifest[T] ): String = mT.erasure.getName
 }
