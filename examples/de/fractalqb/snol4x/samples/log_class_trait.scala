@@ -12,7 +12,8 @@ object SomeClass extends StdLogConfig {
 }
 
 class SomeClass {
+	import SomeClass.trace
 	def fun() {
-		SomeClass.trace( Priority NORMAL )( "fun(%1$d) was called", Integer.valueOf( 7 ) )
+		trace( Priority NORMAL )( "fun(%2$d) was called %1$d times", 7, 1 )
 	}
 }
