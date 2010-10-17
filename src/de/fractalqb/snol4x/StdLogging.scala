@@ -1,6 +1,6 @@
 package de.fractalqb.snol4x
 
-trait StdLogConfig {
+trait StdLogging {
 	val componentPath: String
 	lazy val component: Category = Component( componentPath )
 	
@@ -13,6 +13,6 @@ trait StdLogConfig {
 	lazy val fatal = Logger( Priority.IMPORTANT, Topic PROBLEM, component )
 }
 
-object StdLogConfig {
+object StdLogging {
 	def pathFor[T]()( implicit mT: Manifest[T] ): String = mT.erasure.getName
 }

@@ -27,6 +27,23 @@ object Facet {
 
   lazy val COMPONENT = this( "component" )
   lazy val TOPIC = this( "topic" )
+
+  val INIT_CFG_PROP = "de.fractalqb.snol4x.init-class"
+  
+  private def intitializeConfiguration() {
+	  val initClassNm = System.getProperty( INIT_CFG_PROP,
+	 		                                classOf[DefaultInit].getName )
+	  try {
+		  val initClass = Class forName initClassNm
+		  val init = initClass.newInstance.asInstanceOf[Initialize]
+		  init.initialize()
+	  }
+	  catch {
+	 	  case _ =>
+	  }
+  }
+
+  private val initConfig = intitializeConfiguration()
 }
 
 

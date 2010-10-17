@@ -13,6 +13,7 @@ abstract class Category( val name: String,
 	}
   }
   private[snol4x] var logrs = Set.empty[Logger]
+  private var chans = Set.empty[Channel]
 
   def path: String
   def facet: Facet
@@ -35,7 +36,17 @@ abstract class Category( val name: String,
 
   def apply( pathStr: String, sep: String = "\\." ): Category =
 	this( pathStr split sep )
+
+  def channels = chans
 	
+  def += ( channel: Channel ) = { chans += channel; this }
+  def -= ( channel: Channel ) = { chans -= channel; this }
+  
+  def reconfigure() {
+	  subs.foreach( _.reconfigure() )
+	  logrs.foreach( _.reconf() )
+  }
+  
   override def canEqual( that: Any ): Boolean =
 	that.isInstanceOf[Category]
 }

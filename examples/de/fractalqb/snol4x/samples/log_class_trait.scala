@@ -2,8 +2,8 @@ package de.fractalqb.snol4x.samples
 
 import de.fractalqb.snol4x._
 
-object SomeClass extends StdLogConfig {
-	override val componentPath = StdLogConfig.pathFor[SomeClass]
+object SomeClass extends StdLogging {
+	override val componentPath = StdLogging.pathFor[SomeClass]
 	
 	def main( args: Array[String] ) {
 		val instance = new SomeClass
