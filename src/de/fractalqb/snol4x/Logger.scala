@@ -13,7 +13,7 @@ class Logger( cat: Category, moreCats: Seq[Category] ) {
 		val ts = System.currentTimeMillis
 		if ( prio >= minPrio ) {
 			for ( (_, cs) <- chans.rangeImpl( Some(prio), None ) )
-				cs.foreach { _.send( cats, ts, form, args.toArray ) }
+				cs.foreach { _.send( cats, ts, prio, form, args.toArray ) }
 		}
 	}
 	
