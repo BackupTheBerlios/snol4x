@@ -1,7 +1,7 @@
 package de.fractalqb.snol4x
 
 trait StdLogging {
-	val componentPath: String
+	protected val componentPath: String
 	lazy val component: Category = Component( componentPath )
 	
 	lazy val info = Logger( Topic.INFO, component )
@@ -14,5 +14,5 @@ trait StdLogging {
 }
 
 object StdLogging {
-	def pathFor[T]()( implicit mT: Manifest[T] ): String = mT.erasure.getName
+	def pathFor[T]( implicit mT: Manifest[T] ): String = mT.erasure.getName
 }
