@@ -10,8 +10,8 @@ class Logger( cat: Category, moreCats: Seq[Category] ) {
 	reconf()
 
 	def apply( prio: Short )( form: String, args: Any* ) {
-		val ts = System.currentTimeMillis
 		if ( prio >= minPrio ) {
+			val ts = System.currentTimeMillis
 			for ( (_, cs) <- chans.rangeImpl( Some(prio), None ) )
 				cs.foreach { _.send( cats, ts, prio, form, args.toArray ) }
 		}

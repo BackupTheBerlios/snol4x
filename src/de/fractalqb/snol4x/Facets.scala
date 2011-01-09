@@ -53,6 +53,9 @@ object Component {
 
   def apply( pathStr: String, sep: String = "\\." ) =
 	Facet.COMPONENT( pathStr, sep )
+	
+  def of[T]( implicit m: ClassManifest[T] ) =
+	Facet.COMPONENT( m.erasure.getName )
 }
 
 object Topic {
