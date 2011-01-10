@@ -1,6 +1,7 @@
 package de.fractalqb.snol4x
 
-abstract class Channel extends Equals {
+abstract class Channel extends Equals
+{
 	def send( cats: Seq[Category],
 			  timestamp: Long,
 			  prio: Short,

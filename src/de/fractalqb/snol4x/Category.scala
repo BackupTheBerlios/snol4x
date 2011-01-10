@@ -12,6 +12,7 @@ abstract class Category( val name: String,
 			sc1.name compare sc2.name
 	}
   }
+  
   private[snol4x] var logrs = Set.empty[Logger]
   private var chans = Set.empty[Channel]
 

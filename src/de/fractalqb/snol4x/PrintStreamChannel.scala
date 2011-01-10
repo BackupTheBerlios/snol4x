@@ -3,7 +3,8 @@ package de.fractalqb.snol4x
 import java.text.SimpleDateFormat
 import java.io.PrintStream
 
-object PrintStreamChannel {
+object PrintStreamChannel
+{
 	lazy val OUT = new PrintStreamChannel( System.out, BasicFormat )
 	lazy val ERR = new PrintStreamChannel( System.err, BasicFormat )
 	
@@ -17,7 +18,9 @@ object PrintStreamChannel {
 	}
 }
 
-object BasicFormat extends PrintStreamChannel.Format {
+
+object BasicFormat extends PrintStreamChannel.Format
+{
 	private val dtfm = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss.SSS" )
 
 	def apply( os: PrintStream,
@@ -33,6 +36,7 @@ object BasicFormat extends PrintStreamChannel.Format {
 		os.append( ':' ).append( form.format( args: _* ) ).println			
 	}
 }
+
 
 class PrintStreamChannel( val os: PrintStream,
 		                  var fmt: PrintStreamChannel.Format )

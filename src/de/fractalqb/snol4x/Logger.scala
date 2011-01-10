@@ -3,7 +3,8 @@ package de.fractalqb.snol4x
 import scala.collection.mutable
 import scala.collection.immutable.SortedMap;
 
-class Logger( cat: Category, moreCats: Seq[Category] ) {
+class Logger( cat: Category, moreCats: Seq[Category] )
+{
 	val cats = Logger.uniqFacets( cat, moreCats )
 	var minPrio: Short = 0	//< priority threshold
 	var chans = SortedMap.empty[Short, List[Channel]]
@@ -18,10 +19,8 @@ class Logger( cat: Category, moreCats: Seq[Category] ) {
 	}
 	
 	private[snol4x] def reconf() {
-		// deprecated: chans += (0.asInstanceOf[Short] -> List(PrintStreamChannel.ERR))
-		
 		// take the minimum threshold per channel from each path
-		val minThByChan = mutable.Map.empty[Channel,Short]
+		val minThByChan = mutable.Map.empty[Channel, Short]
 		for ( cat <- cats;
 			  thByChan = Logger.chansWithPrio( cat );
 			  (chan, th) <- thByChan )
@@ -45,7 +44,9 @@ class Logger( cat: Category, moreCats: Seq[Category] ) {
 	}
 }
 
-object Logger {	
+
+object Logger
+{	
 	def apply( cat: Category, moreCats: Category* ) =
 		new Logger( cat, moreCats )
 

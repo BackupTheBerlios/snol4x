@@ -9,8 +9,8 @@ class Facet private ( name: String,
 }
 
 
-object Facet {
-
+object Facet
+{
   def apply( name: String ): Facet =
 	facs.find( _.name == name ) match {
 	  case Some(f) => f
@@ -43,11 +43,12 @@ object Facet {
 	  }
   }
 
-  private val initConfig = intitializeConfiguration()
+  intitializeConfiguration()
 }
 
 
-object Component {
+object Component
+{
   def apply( path: Seq[String] ) =
 	Facet.COMPONENT( path )
 
@@ -57,6 +58,7 @@ object Component {
   def of[T]( implicit m: ClassManifest[T] ) =
 	Facet.COMPONENT( m.erasure.getName )
 }
+
 
 object Topic {
 	val INFO =  Facet.TOPIC( "info" )
