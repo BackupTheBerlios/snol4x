@@ -14,11 +14,11 @@ object SomeClass extends StdLogging {
 }
 
 class SomeClass {
-	import SomeClass.debug
-	val trace = SomeClass.trace( Priority NORMAL )_
+	import SomeClass.LOGdebug
+	val trace = SomeClass.LOGtrace( Priority NORMAL )_
 	def fun() {
 		SomeClass.funCounter += 1
 		trace( "fun(%2$d) was called %1$d times", SomeClass.funCounter, 42 )
-		debug( Priority IRRELEVANT )( "There's nothing to debug, here!" )
+		LOGdebug( Priority IRRELEVANT )( "There's nothing to debug, here!" )
 	}
 }

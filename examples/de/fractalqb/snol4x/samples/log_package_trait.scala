@@ -6,7 +6,7 @@ object Log extends StdLogging {
 	override val componentPath = "de.fractalqb.snol4x.samples"
 	
 	def main( args: Array[String] ) {
-		Log.trace( Priority NORMAL )( "doing fine" )
-		Log.warn( "The end is near!" )
+		LOGtrace( Priority NORMAL )( "doing fine" )
+		LOGwarn( "The end is near!" )
 	}
 }

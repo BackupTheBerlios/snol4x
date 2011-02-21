@@ -57,7 +57,7 @@ object Logger
 		var res = List( cat )
 		for ( cat <- moreCats ) {
 			if ( res.map( _.facet ) contains cat.facet )
-				Log.warn( "ignore category '%s' for duplicate facet", cat.path )
+				Log.LOGwarn( "ignore category '%s' for duplicate facet", cat.path )
 			else
 				res +:= cat
 		}
